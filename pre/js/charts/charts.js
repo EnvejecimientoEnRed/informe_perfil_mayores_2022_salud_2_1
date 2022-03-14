@@ -7,15 +7,92 @@ import { setChartCanvas, setChartCanvasImage, setCustomCanvas, setChartCustomCan
 import { setRRSSLinks } from '../modules/rrss';
 import { setFixedIframeUrl } from './chart_helpers';
 
-export function initChart(iframe) {
-    
+//Colores fijos
+const COLOR_PRIMARY_1 = '#F8B05C', 
+COLOR_PRIMARY_2 = '#E37A42', 
+COLOR_ANAG_1 = '#D1834F', 
+COLOR_ANAG_2 = '#BF2727', 
+COLOR_COMP_1 = '#528FAD', 
+COLOR_COMP_2 = '#AADCE0', 
+COLOR_GREY_1 = '#B5ABA4', 
+COLOR_GREY_2 = '#64605A', 
+COLOR_OTHER_1 = '#B58753', 
+COLOR_OTHER_2 = '#731854';
+
+export function initChart(iframe) {   
 
     //Lectura de datos
     d3.csv('https://raw.githubusercontent.com/CarlosMunozDiazCSIC/informe_perfil_mayores_2022_salud_2_1/main/data/edv0_1908_2020.csv', function(error,data) {
         if (error) throw error;
 
-        //Desarrollo del gráfico   
+        //Desarrollo del gráfico
+        let margin = {top: 10, right: 30, bottom: 30, left: 60},
+            width = document.getElementById('chart').clientWidth - margin.left - margin.right,
+            height = document.getElementById('chart').clientHeight - margin.top - margin.bottom;
 
+        let svg = d3.select("#chart")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+        let x = d3.scaleLinear()
+            .domain(d3.extent(data, function(d) { return d.Year; }))
+            .range([ 0, width ]);
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x).ticks(5));
+    
+        // Add Y axis
+        let y = d3.scaleLinear()
+            .domain([0, 100])
+            .range([ height, 0 ]);
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        let line1 = d3.line()
+            .x(function(d) { return x(d.Year); })
+            .y(function(d) { return y(+d.Male); });
+        let line2 = d3.line()
+            .x(function(d) { return x(d.Year); })
+            .y(function(d) { return y(+d.Female); });
+
+        function init() {
+            svg.select("line1")
+                .data(data)
+                .enter()
+                .append("path")
+                .attr('class', 'line line-male')
+                .attr("fill", "none")
+                .attr("stroke", function(d){ return COLOR_PRIMARY_1; })
+                .attr("stroke-width", 1.5)
+                .attr("d", function(d){
+                    return line1(d);
+                });
+            
+            svg.select("line2")
+                .data(data)
+                .enter()
+                .append("path")
+                .attr('class', 'line line-female')
+                .attr("fill", "none")
+                .attr("stroke", function(d){ return COLOR_COMP_1; })
+                .attr("stroke-width", 1.5)
+                .attr("d", function(d){
+                    return line2(d);
+                });
+        }
+
+        function animateChart() {
+
+        }
+
+        //////
+        ///// Resto - Chart
+        //////
+        init();
 
         //Animación del gráfico
         document.getElementById('replay').addEventListener('click', function() {
