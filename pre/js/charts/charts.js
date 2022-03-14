@@ -38,12 +38,16 @@ export function initChart(iframe) {
                 .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
 
-        let x = d3.scaleLinear()
-            .domain(d3.extent(data, function(d) { return d.Year; }))
+        let x = d3.scaleBand()
+            .domain(d3.map(data, function(d){ return d.Year; }).keys())
             .range([ 0, width ]);
+
+        let xAxis = d3.axisBottom(x)
+            .tickValues(x.domain().filter(function(d,i){ return !(i%10)}));
+
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x).ticks(5));
+            .call(xAxis);
     
         // Add Y axis
         let y = d3.scaleLinear()
@@ -52,37 +56,26 @@ export function initChart(iframe) {
         svg.append("g")
             .call(d3.axisLeft(y));
 
-        let line1 = d3.line()
-            .x(function(d) { return x(d.Year); })
-            .y(function(d) { return y(+d.Male); });
-        let line2 = d3.line()
-            .x(function(d) { return x(d.Year); })
-            .y(function(d) { return y(+d.Female); });
-
         function init() {
-            svg.select("line1")
-                .data(data)
-                .enter()
-                .append("path")
-                .attr('class', 'line line-male')
+            svg.append("path")
+                .datum(data)
                 .attr("fill", "none")
-                .attr("stroke", function(d){ return COLOR_PRIMARY_1; })
+                .attr("stroke", COLOR_PRIMARY_1)
                 .attr("stroke-width", 1.5)
-                .attr("d", function(d){
-                    return line1(d);
-                });
-            
-            svg.select("line2")
-                .data(data)
-                .enter()
-                .append("path")
-                .attr('class', 'line line-female')
+                .attr("d", d3.line()
+                .x(function(d) { return x(d.Year) })
+                .y(function(d) { return y(+d.Male) })
+                )
+        
+            svg.append("path")
+                .datum(data)
                 .attr("fill", "none")
-                .attr("stroke", function(d){ return COLOR_COMP_1; })
+                .attr("stroke", COLOR_COMP_1)
                 .attr("stroke-width", 1.5)
-                .attr("d", function(d){
-                    return line2(d);
-                });
+                .attr("d", d3.line()
+                .x(function(d) { return x(d.Year) })
+                .y(function(d) { return y(+d.Female) })
+                )
         }
 
         function animateChart() {
@@ -110,13 +103,13 @@ export function initChart(iframe) {
         setRRSSLinks('evolucion_esperanza_vida_nacimiento');
 
         //Captura de pantalla de la visualización
-        setChartCanvas();
+        //setChartCanvas();
         setCustomCanvas();
 
         let pngDownload = document.getElementById('pngImage');
 
         pngDownload.addEventListener('click', function(){
-            setChartCanvasImage('evolucion_esperanza_vida_nacimiento');
+            //setChartCanvasImage('evolucion_esperanza_vida_nacimiento');
             setChartCustomCanvasImage('evolucion_esperanza_vida_nacimiento')
         });
 
