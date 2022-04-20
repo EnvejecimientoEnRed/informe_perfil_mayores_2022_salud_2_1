@@ -139,7 +139,7 @@ export function initChart(iframe) {
 
                     //Texto
                     let html = '<p class="chart__tooltip--title">' + d.Year + '</p>' + 
-                        '<p class="chart__tooltip--text">La esperanza de vida para las mujeres es de <b>' + numberWithCommas3(parseFloat(d.Female)) + '</b> años; para los hombres, de <b>' + numberWithCommas3(parseFloat(d.Male)) + '</b> años</p>';
+                        '<p class="chart__tooltip--text">La esperanza de vida al nacer para las mujeres es de <b>' + numberWithCommas3(parseFloat(d.Female)) + '</b> años; para los hombres, de <b>' + numberWithCommas3(parseFloat(d.Male)) + '</b> años</p>';
                 
                     tooltip.html(html);
 
